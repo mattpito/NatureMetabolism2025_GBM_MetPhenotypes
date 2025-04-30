@@ -1,5 +1,5 @@
 # 🧠 NatureMetabolism2025_GBM_MetPhenotypes 
-Code for Nature Metabolism paper: Cell-intrinsic metabolic phenotypes identified in glioblastoma patients using mass spectrometry imaging of 13C-labeled glucose metabolism.
+Code for Nature Metabolism paper: Cell-intrinsic metabolic phenotypes identified in glioblastoma patients using mass spectrometry imaging of 13C-labeled glucose metabolism. The MSI registration is not included in this github. See Methods of the paper.
 
 ## 🎯 Project Summary
 
