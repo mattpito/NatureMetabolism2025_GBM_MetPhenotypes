@@ -124,8 +124,9 @@ spatial_data_ALL_filtered <- subset(x = spatial_data_ALL,
                                       nFeature_Spatial < 13000 & 
                                       percent.mt < 20)
 
-#For further downstream prossesing, the merged object needs to be "recalibrated" since SCT was run on the individual cases. You will notice a seurat error if there are multiple count objects
-spatial_data_ALL_filtered <- PrepSCTFindMarkers(spatial_data_ALL_filtered)
+#For further downstream prossesing, the merged object may  needs to be "recalibrated" if SCTtransform was run again on the merged object. You will notice a seurat error if there are multiple count objects
+spatial_data_ALL_filtered <- PrepSCTFindMarkers(spatial_data_ALL_filtered) <<<--- You need to run SCT transform again on the merged object. No big difference for this spesific dataset when trying both methods.
+
 
 
 The data avilable in the paper contain the spatial_data_ALL_filtered with some extra metadata loaded with basic csv manipulation (dplyr). Such metadata are for example the column CustomClusters, that labels each tissue
