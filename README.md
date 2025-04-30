@@ -9,7 +9,7 @@ We investigated metabolic heterogeneity in GBM using integrated metabolomics and
 
 ## ⚙️ Main Workflow
 
-<img src="wf_png/GBM_metabolic_workflow.png" alt="Workflow Diagram" width="600"/>
+<img src="wf_png/GBM_metabolic_workflow.png" alt="Workflow Diagram" width="400"/>
 
 ## 💻 Dependencies
 
