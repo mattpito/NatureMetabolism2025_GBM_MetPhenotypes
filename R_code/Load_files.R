@@ -114,3 +114,27 @@ merged_visium$DonorID_rep
 merged_visium$SCT_snn_res.0.05
 
 # saveRDS(merged_visium, file = "INSERT_PATH/filename.rds")
+
+# (Optional) Remove spots that may be of low quality (striped, damaged etc)
+spatial_data_ALL <- merged_visium
+spatial_data_ALL_filtered <- subset(x = spatial_data_ALL, 
+                                    subset = nCount_Spatial < 200000 & 
+                                      nCount_Spatial > 1000 & 
+                                      nFeature_Spatial > 1000 & 
+                                      nFeature_Spatial < 13000 & 
+                                      percent.mt < 20)
+
+#For further downstream prossesing, the merged object needs to be "recalibrated" since SCT was run on the individual cases. You will notice a seurat error if there are multiple count objects
+spatial_data_ALL_filtered <- PrepSCTFindMarkers(spatial_data_ALL_filtered)
+
+
+
+
+
+
+
+
+
+
+
+
