@@ -129,7 +129,7 @@ spatial_data_ALL_filtered <- PrepSCTFindMarkers(spatial_data_ALL_filtered)
 
 
 The data avilable in the paper contain the spatial_data_ALL_filtered with some extra metadata loaded with basic csv manipulation (dplyr). Such metadata are for example the column CustomClusters, that labels each tissue
-
+You can annotate using loupe or with interactive seurat plot as well.
 
 
 
