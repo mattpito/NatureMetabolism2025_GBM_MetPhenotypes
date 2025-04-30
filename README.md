@@ -13,3 +13,4 @@ We investigated metabolic heterogeneity in GBM using integrated metabolomics and
 
 ## 💻 Dependencies
 
+See full session information and package versions here: [sessionInfo.txt](sessionInfo/sessionInfo.txt)
