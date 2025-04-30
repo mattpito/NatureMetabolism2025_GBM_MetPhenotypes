@@ -1,0 +1,115 @@
+data <- spatial_norm@meta.data
+filtered_data <- data[(data$AstrazenecaRegister_group != "Inconclusive" & data$AstrazenecaRegister_group != "Unregistered" &
+                         !data$CustomClusters %in% c("557761_R3_P1", "557728_R1_P2")), ] ### Excluding MSI unregistered plots + 2 less confident regions (one non GBM, one with potential spatial damage)
+filtered_data <- filtered_data %>%
+  group_by(CustomClusters) %>%
+  mutate(CustomCluster_Sub2 = paste0(CustomClusters, "_sub", rep(1:20000, length.out = n()))) #Essentially selecting each spot per region. You can use this method to try vairous randomizing splits
+
+library(ggplot2)
+library(dplyr)
+library(ggprism)
+library(cowplot)
+library(gridExtra)
+
+# Function to compute and visualize population percentages across metabolic conditions
+calculate_and_plot_single_population_comparison <- function(data, 
+                                                            target_population = "Vascular", 
+                                                            region_column = "CustomCluster_Sub2") {
+  # Define metabolic conditions to compare
+  conditions_of_interest <- c("GlycoSignal", "LowSignal", "OxphosSignal")
+  
+  # Filter and prepare the data
+  results <- data %>%
+    dplyr::filter(AstrazenecaRegister_group %in% conditions_of_interest) %>%
+    dplyr::rename(Condition = AstrazenecaRegister_group) %>%
+    mutate(Percentage = .data[[target_population]] * 100) %>%
+    dplyr::filter(!is.na(Percentage))
+  
+  # Calculate dynamic y-axis max
+  ymax <- max(results$Percentage, na.rm = TRUE) + 5
+  
+  # Create the plot
+  plot <- ggplot(results, aes(x = Condition, y = Percentage, color = Condition)) +
+    geom_jitter(width = 0.2, size = 0.5, alpha = 0.8) +  # Individual data points
+    geom_boxplot(outlier.shape = NA, fill = "white", alpha = 0.7, color = "black", width = 0.5) +
+    scale_color_manual(values = c("GlycoSignal" = "blue", 
+                                  "LowSignal" = "red", 
+                                  "OxphosSignal" = "yellow")) +
+    scale_y_continuous(
+      limits = c(0, ymax),
+      breaks = seq(0, ymax, by = 10),
+      minor_breaks = seq(0, ymax, by = 5)
+    ) +
+    labs(
+      x = paste0("% ", target_population),
+      y = "Normalised Weight %",
+      title = NULL
+    ) +
+    theme(
+      text = element_text(size = 22, color = "black"),
+      panel.background = element_rect(fill = "white", color = NA),
+      panel.border = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.line.x.bottom = element_line(color = "black"),
+      axis.line.y.left = element_line(color = "black"),
+      axis.title = element_text(face = "bold"),
+      axis.text.x = element_blank(),
+      axis.text.y = element_text(face = "bold", color = "black"),
+      legend.title = element_blank(),
+      legend.position = "none"
+    )
+  
+  # Return data and plot
+  list(results = results, plot = plot)
+}
+
+# Function to apply consistent theme modifications to plots
+adjust_plot <- function(plot) {
+  plot + 
+    theme(
+      plot.margin = unit(c(0.8, 0.8, 0.8, 0.8), "cm"),
+      text = element_text(size = 15),
+      axis.text = element_text(size = 15),
+      axis.title = element_text(size = 15),
+      legend.position = "none"
+    )
+}
+
+# Generate plots for multiple populations
+cell_types <- c("Immune", "Astrocytes", "Neurons", "Vascular", "Oligodendrocytes")
+plots <- list()
+
+for (i in seq_along(cell_types)) {
+  output <- calculate_and_plot_single_population_comparison(filtered_data, target_population = cell_types[i])
+  plots[[i]] <- adjust_plot(output$plot)
+}
+
+# Generate summary statistics for the last processed population
+summary_stats <- output$results %>%
+  group_by(Condition) %>%
+  summarise(
+    n = n(),
+    median = median(Percentage, na.rm = TRUE),
+    Q1 = quantile(Percentage, 0.25, na.rm = TRUE),
+    Q3 = quantile(Percentage, 0.75, na.rm = TRUE),
+    min_val = min(Percentage, na.rm = TRUE),
+    max_val = max(Percentage, na.rm = TRUE)
+  )
+
+print(summary_stats)
+
+# Extract legend from the last plot before it was stripped
+legend <- get_legend(output$plot)
+
+# Combine all plots with a single shared legend
+combined_plot <- plot_grid(
+  legend,
+  plot_grid(plotlist = plots, ncol = 3),
+  ncol = 1,
+  rel_heights = c(0.1, 1)
+)
+
+# Save the combined plot to a PDF
+
+print(combined_plot)
