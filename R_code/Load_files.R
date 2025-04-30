@@ -126,8 +126,10 @@ spatial_data_ALL_filtered <- subset(x = spatial_data_ALL,
 
 #For further downstream prossesing, the merged object may  needs to be "recalibrated" if SCTtransform was run again on the merged object. You will notice a seurat error if there are multiple count objects
 spatial_data_ALL_filtered <- PrepSCTFindMarkers(spatial_data_ALL_filtered) <<<--- You need to run SCT transform again on the merged object. No big difference for this spesific dataset when trying both methods.
-
-
+#You might get an error Multiple UMI assays are used for SCTransform: Spatial, RNA
+#Seurat updates are notorious for breaking the objects.... to fix ename
+slot(object = spatial_data_ALL_filtered@assays$SCT@SCTModel.list[[1]], name="umi.assay")<-"Spatial" run this as many time as the number of samples 
+#Increasing each time list to +1
 
 The data avilable in the paper contain the spatial_data_ALL_filtered with some extra metadata loaded with basic csv manipulation (dplyr). Such metadata are for example the column CustomClusters, that labels each tissue
 You can annotate using loupe or with interactive seurat plot as well.
